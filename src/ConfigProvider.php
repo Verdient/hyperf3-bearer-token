@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Verdient\Hyperf3\BearerToken;
 
 use Verdient\Hyperf3\AccessControl\AuthenticatorInterface;
+use Verdient\Hyperf3\AccessControl\TokenGeneratorInterface;
 
 class ConfigProvider
 {
@@ -12,7 +13,8 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
-                AuthenticatorInterface::class => BearerTokenAuthenticator::class
+                AuthenticatorInterface::class => BearerTokenAuthenticator::class,
+                TokenGeneratorInterface::class => BearerTokenGenerator::class
             ],
             'publish' => [
                 [

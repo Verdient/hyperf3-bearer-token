@@ -4,7 +4,7 @@
     "require": {
         "hyperf/contract": "^3.1",
         "psr/http-message": "^2.0",
-        "verdient/hyperf3-access-control": "^1.0",
+        "verdient/hyperf3-access-control": "^2.0",
         "verdient/token": "^0.1"
     },
     "autoload": {

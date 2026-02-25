@@ -6,27 +6,30 @@ namespace Verdient\Hyperf3\BearerToken;
 
 use Exception;
 use Hyperf\Contract\ConfigInterface;
+use Override;
 use Psr\Http\Message\ServerRequestInterface;
 use Verdient\Hyperf3\AccessControl\AbstractAuthenticator;
-use Verdient\Hyperf3\AccessControl\Credential;
 use Verdient\Hyperf3\AccessControl\Identity;
 use Verdient\Hyperf3\AccessControl\IdentityInterface;
 use Verdient\token\Token;
 
 /**
- * Token令牌认证器
+ * 访问令牌认证器
+ *
  * @author Verdient。
  */
 class BearerTokenAuthenticator extends AbstractAuthenticator
 {
     /**
      * 配置集合
+     *
      * @author Verdient。
      */
     protected array $configs = [];
 
     /**
      * @param ConfigInterface $config 配置信息
+     *
      * @author Verdient。
      */
     public function __construct(protected ConfigInterface $config)
@@ -35,12 +38,12 @@ class BearerTokenAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * @inheritdoc
      * @author Verdient。
      */
-    public function identity(Credential $credential): ?IdentityInterface
+    #[Override]
+    public function identity(ServerRequestInterface $request, string $group): ?IdentityInterface
     {
-        if (!$token = $this->getToken($credential->getRequest())) {
+        if (!$token = $this->getToken($request)) {
             return null;
         }
 
@@ -52,12 +55,6 @@ class BearerTokenAuthenticator extends AbstractAuthenticator
 
         $token = implode(' ', $parts);
 
-        $group = 'default';
-
-        if ($route = $credential->route()) {
-            $group = $route->group();
-        }
-
         if (!$identifier = $this->parseToken($token, $group)) {
             return null;
         }
@@ -67,9 +64,10 @@ class BearerTokenAuthenticator extends AbstractAuthenticator
 
     /**
      * 解析令牌
+     *
      * @param string $token 令牌
      * @param string $group 分组
-     * @return int|string|false
+     *
      * @author Verdient。
      */
     protected function parseToken(string $token, string $group): int|string|false
@@ -87,18 +85,23 @@ class BearerTokenAuthenticator extends AbstractAuthenticator
 
     /**
      * 获取令牌
+     *
      * @param ServerRequestInterface $request 请求
+     *
      * @author Verdient。
      */
-    public function getToken(ServerRequestInterface $request): string|null
+    public function getToken(ServerRequestInterface $request): ?string
     {
         if ($token = $request->getHeaderLine('authorization')) {
             return $token;
         }
+
         $queryParams = array_change_key_case($request->getQueryParams(), CASE_LOWER);
+
         if (!empty($queryParams['authorization'])) {
             return $queryParams['authorization'];
         }
+
         return null;
     }
 }
